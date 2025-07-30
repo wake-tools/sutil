@@ -1,7 +1,8 @@
+
 ----
-> ⚠️ This is a customized fork of the [Sokol](https://github.com/floooh/sokol) single-file app framework library, maintained by [Wake.Tools](https://wake.tools) for integration into the Wake runtime.
+> ⚠️ This is a customized fork of the [Sokol](https://github.com/floooh/sokol) utility libraries, maintained by [Wake.Tools](https://wake.tools) for integration into the Wake runtime.
 ----
->🔹 Only the `sokol_app` component of this fork is currently used to build the Wake-compatible app framework backend (window, context, input).
+>🔹 Only the `Utility libraries` components of this fork is currently used to build the Wake-compatible sokol utilities.
 
  While this fork is built and packaged internally for Wake.Tools, it remains compatible with the original Sokol sources and build process.  
  The maintained version is tailored for high stability and deep integration with the Wake environment.
@@ -10,7 +11,7 @@
 
  📦 To ensure full compatibility with Wake's module system, dynamic libraries should follow the naming convention:  
  `author--name-version-sys-type.ext`
-> (e.g., `myrepo--sokolapp-0.2.0rc1-w32-r.dll`, `myrepo--sokolapp-0.2.0rc1-osx-d.dylib`, etc.)
+> (e.g., `myrepo--sokolutil-0.2.0rc1-w32-r.dll`, `myrepo--sokolutil-0.2.0rc1-osx-d.dylib`, etc.)
 
  🔄 If your changes could benefit the broader Sokol community, consider submitting pull requests to the upstream repository as well.
 
@@ -23,15 +24,31 @@
 
 > Create a `example.c` file containing the following to produce a `.dll` usable within the Wake environment:
 ```c
-#define SOKOL_DLL
-#define SOKOL_NO_ENTRY
-#define SOKOL_IMPL
-#define SOKOL_API_DECL  __declspec(dllexport) 
+// Sokol headers (no direct implementation here)
+#define SOKOL_D3D11 
+#include "sokol_gfx.h"
 #include "sokol_app.h"
+#include "sokol_imgui.h"
+#include "sokol_gfx_imgui.h"
+#define SOKOL_API_DECL  __declspec(dllexport) 
+
+// Glue everything together
+#define SOKOL_GLUE_IMPL
+#include "sokol_glue.h"
+
+// Utils
+#define SOKOL_GL_IMPL
+#include "sokol_gl.h"
+#define FONTSTASH_IMPLEMENTATION
+#include "fontstash.h"
+#define SOKOL_FONTSTASH_IMPL
+#include "sokol_fontstash.h"
+// ...
+// Add other optional Sokol-based utilities below if needed
 ```
 > Then compile with a toolchain like cl.exe or gcc:
 ```
-gcc -shared -o myrepo--sokolapp-0.2.0rc1-w32-r.dll example.c
+gcc -shared -o myrepo--sokolutil-0.2.0rc1-w32-r.dll example.c -l{author}sapp{ver}-w32-r -l{author}sgfx{ver}-w32-r -l{author}imgui{ver}-w32-r
 ```
 ----
 > © 2025 Majify Technologies.  
@@ -40,6 +57,7 @@ gcc -shared -o myrepo--sokolapp-0.2.0rc1-w32-r.dll example.c
 > Binaries or modules built from this code may be distributed as part of the Wake ecosystem under the Wake Public License (WPL).
 > For standalone use, this fork remains free and open.
 ----
+
 <p align="center">
     <img src="assets/logo_full_large.png" style="width: 60%" /><br/><br/>Simple
     <a href="https://github.com/nothings/stb/blob/master/docs/stb_howto.txt">STB-style</a>
